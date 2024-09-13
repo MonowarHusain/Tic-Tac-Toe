@@ -1,0 +1,393 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Tic Tac Toe</title>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
+
+<style>
+ body {
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    text-align: center;
+    margin: 0;
+    padding: 0;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    min-height: 100vh;
+    background-color: #000000;
+    color: #ffffff;
+  }
+
+  #game-container {
+    max-width: 600px;
+    margin: auto;
+    padding: 20px;
+    border-radius: 10px;
+    background-color: #000000;
+    box-shadow: 0px 0px 20px rgba(255, 255, 255, 0.1);
+  }
+
+  .board {
+    display: grid;
+    grid-template-columns: repeat(3, 100px);
+    grid-template-rows: repeat(3, 100px);
+    gap: 2px;
+    margin: 20px auto;
+    border: 2px solid #ffffff;
+    border-radius: 5px;
+    background-color: #000000;
+    overflow: hidden;
+  }
+
+  .cell {
+    position: relative;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 3em;
+    cursor: pointer;
+    background-color: #000000;
+    transition: background-color 0.3s ease;
+    color: #ffffff;
+  }
+
+  .cell:hover {
+    background-color: #333333;
+  }
+
+  #message {
+    font-size: 1.5em;
+    margin-top: 20px;
+  }
+
+  #score {
+    margin-top: 20px;
+  }
+
+  #score span {
+    margin: 0 10px;
+  }
+
+  .footer {
+    position: fixed;
+    bottom: 20px;
+    left: 50%;
+    transform: translateX(-50%);
+    color: #cccccc;
+    font-size: 1.2em;
+    opacity: 0.8;
+  }
+
+  .cell.x::after,
+  .cell.o::after {
+    content: attr(data-symbol);
+    position: absolute;
+    opacity: 0;
+    transition: opacity 0.5s ease;
+  }
+
+  .cell.played::after {
+    opacity: 1;
+  }
+
+  .cell.x::after {
+    color: #ff3d00;
+    left: 50%;
+    top: 50%;
+    transform: translate(-50%, -50%);
+  }
+
+  .cell.o::after {
+    color: #2962ff;
+    left: 50%;
+    top: 50%;
+    transform: translate(-50%, -50%);
+  }
+
+  button {
+    padding: 10px 20px;
+    font-size: 1em;
+    background-color: #ffffff;
+    color: #000000;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    transition: background-color 0.3s ease, color 0.3s ease;
+  }
+
+  button:hover {
+    background-color: #cccccc;
+    color: #000000;
+  }
+
+  select {
+    padding: 8px 16px;
+    font-size: 1em;
+    border-radius: 5px;
+    border: 1px solid #ffffff;
+    cursor: pointer;
+    outline: none;
+    color: #ffffff;
+    background-color: #000000;
+  }
+
+  h1 {
+    animation: blink 1s infinite;
+  }
+
+  @keyframes blink {
+    0% {
+      opacity: 1;
+    }
+    50% {
+      opacity: 0;
+    }
+    100% {
+      opacity: 1;
+    }
+  }
+
+  .social-icons {
+    margin-top: 20px;
+  }
+
+  .social-icons a {
+    color: #ffffff;
+    font-size: 1.5em;
+    margin: 0 10px;
+    transition: color 0.3s ease;
+  }
+
+  .social-icons a:hover {
+    color: #cccccc;
+  }
+
+</style>
+</head>
+<body>
+  <div id="game-container">
+    <h1>Tic Tac Toe</h1>
+    <div class="board" id="board">
+      <div class="cell" onclick="handleClick(0)"></div>
+      <div class="cell" onclick="handleClick(1)"></div>
+      <div class="cell" onclick="handleClick(2)"></div>
+      <div class="cell" onclick="handleClick(3)"></div>
+      <div class="cell" onclick="handleClick(4)"></div>
+      <div class="cell" onclick="handleClick(5)"></div>
+      <div class="cell" onclick="handleClick(6)"></div>
+      <div class="cell" onclick="handleClick(7)"></div>
+      <div class="cell" onclick="handleClick(8)"></div>
+    </div>
+    <div id="message"></div>
+    <div id="score">
+      <span>X Wins: <span id="xWins">0</span></span>
+      <span>O Wins: <span id="oWins">0</span></span>
+    </div>
+    <div>
+      <button onclick="resetGame()">Play Again</button>
+</div>
+      <label for="difficulty">Select Difficulty Level:</label>
+      <select id="difficulty" onchange="setDifficulty()">
+        <option value="easy">Easy</option>
+        <option value="hard">Hard</option>
+      </select>
+    </div>
+    <div class="social-icons">
+      <a href="https://github.com/MonowarHusain" target="_blank"><i class="fab fa-github"></i></a>
+      <a href="https://twitter.com/MonowarHusain" target="_blank"><i class="fab fa-twitter"></i></a>
+      <a href="https://www.linkedin.com/in/MonowarHusain" target="_blank"><i class="fab fa-linkedin"></i></a>
+    </div>
+  </div>
+  <footer>Developed by Monowar Husain</footer>
+<script>
+  let currentPlayer = 'X';
+  let difficulty = 'easy';
+  let xWins = 0;
+  let oWins = 0;
+  const board = ['', '', '', '', '', '', '', '', ''];
+  const winningCombinations = [
+    [0, 1, 2],
+    [3, 4, 5],
+    [6, 7, 8],
+    [0, 3, 6],
+    [1, 4, 7],
+    [2, 5, 8],
+    [0, 4, 8],
+    [2, 4, 6]
+  ];
+
+  function handleClick(index) {
+    if (!board[index]) {
+      board[index] = currentPlayer;
+      document.getElementById('board').children[index].innerText = currentPlayer;
+      document.getElementById('board').children[index].classList.add('played', currentPlayer.toLowerCase());
+      if (checkWin()) {
+        document.getElementById('message').innerText = `${currentPlayer} wins!`;
+        updateScore(currentPlayer);
+        disableBoard();
+        return;
+      }
+      if (board.every(cell => cell !== '')) {
+        document.getElementById('message').innerText = "It's a draw!";
+        return;
+      }
+      currentPlayer = currentPlayer === 'X' ? 'O' : 'X';
+      if (currentPlayer === 'O') {
+        setTimeout(makeMove, 500);
+      }
+    }
+  }
+
+  function checkWin() {
+    return winningCombinations.some(combination => {
+      return combination.every(index => board[index] === currentPlayer);
+    });
+  }
+
+  function makeMove() {
+    if (difficulty === 'easy') {
+      makeRandomMove();
+    } else {
+      makeOptimalMove();
+    }
+  }
+
+  function makeRandomMove() {
+    let availableMoves = [];
+    for (let i = 0; i < board.length; i++) {
+      if (board[i] === '') {
+        availableMoves.push(i);
+      }
+    }
+    let randomIndex = Math.floor(Math.random() * availableMoves.length);
+    handleClick(availableMoves[randomIndex]);
+  }
+
+  function makeOptimalMove() {
+    let bestScore = -Infinity;
+    let move;
+    for (let i = 0; i < board.length; i++) {
+      if (board[i] === '') {
+        board[i] = 'O';
+        let score = minimax(board, 0, false);
+        board[i] = '';
+        if (score > bestScore) {
+          bestScore = score;
+          move = i;
+        }
+      }
+    }
+    board[move] = 'O';
+    document.getElementById('board').children[move].innerText = 'O';
+    document.getElementById('board').children[move].classList.add('played', 'o');
+    if (checkWin()) {
+      document.getElementById('message').innerText = "O wins!";
+      updateScore('O');
+      disableBoard();
+      return;
+    }
+    if (board.every(cell => cell !== '')) {
+      document.getElementById('message').innerText = "It's a draw!";
+      return;
+    }
+    currentPlayer = 'X';
+  }
+
+  function minimax(board, depth, isMaximizing) {
+    let result = checkResult();
+    if (result !== null) {
+      if (result === 'O') {
+        return 10 - depth;
+      } else if (result === 'X') {
+        return depth - 10;
+      } else {
+        return 0;
+      }
+    }
+
+    if (isMaximizing) {
+      let maxScore = -Infinity;
+      for (let i = 0; i < board.length; i++) {
+        if (board[i] === '') {
+          board[i] = 'O';
+          let score = minimax(board, depth + 1, false);
+          board[i] = '';
+          maxScore = Math.max(score, maxScore);
+        }
+      }
+      return maxScore;
+    } else {
+      let minScore = Infinity;
+      for (let i = 0; i < board.length; i++) {
+        if (board[i] === '') {
+          board[i] = 'X';
+          let score = minimax(board, depth + 1, true);
+          board[i] = '';
+          minScore = Math.min(score, minScore);
+        }
+      }
+      return minScore;
+    }
+  }
+
+  function checkResult() {
+    for (let combination of winningCombinations) {
+      const [a, b, c] = combination;
+      if (board[a] && board[a] === board[b] && board[a] === board[c]) {
+        return board[a];
+      }
+    }
+    if (board.every(cell => cell !== '')) {
+      return 'draw';
+    }
+    return null;
+  }
+
+  function disableBoard() {
+    document.querySelectorAll('.cell').forEach(cell => {
+      cell.style.pointerEvents = 'none';
+    });
+  }
+
+  function setDifficulty() {
+    difficulty = document.getElementById('difficulty').value;
+    if (currentPlayer === 'O' && difficulty === 'hard') {
+      setTimeout(makeMove, 500);
+    }
+  }
+
+  function updateScore(winner) {
+    if (winner === 'X') {
+      xWins++;
+      document.getElementById('xWins').innerText = xWins;
+    } else if (winner === 'O') {
+      oWins++;
+      document.getElementById('oWins').innerText = oWins;
+    }
+  }
+
+
+  function resetGame() {
+    document.getElementById('message').innerText = '';
+    currentPlayer = 'X';
+    board.fill('');
+    document.querySelectorAll('.cell').forEach(cell => {
+      cell.innerText = '';
+      cell.classList.remove('played', 'x', 'o');
+      cell.style.pointerEvents = 'auto';
+    });
+    if (currentPlayer === 'O' && difficulty === 'hard') {
+      setTimeout(makeMove, 500);
+    }
+  }
+</script>
+
+
+
+
+</body>
+</html>
+
