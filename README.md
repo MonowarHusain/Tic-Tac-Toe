@@ -12,7 +12,6 @@ The **Tic Tac Toe** web application is a simple, interactive game that allows us
 - **Real-Time Feedback**: The game dynamically updates the board and score without refreshing the page.
 - **Score Tracking**: Keeps track of the wins for both players (X and O).
 - **Responsive Design**: The game is optimized for various screen sizes.
-- **Social Media Links**: Links to GitHub, Twitter, and LinkedIn profiles.
 - **Animations**: The game includes hover effects, blink animations, and smooth transitions for a polished user experience.
 
 ## Technologies Used
@@ -37,14 +36,9 @@ The **Tic Tac Toe** web application is a simple, interactive game that allows us
 ### Restart:
 - Click "Play Again" to reset the game and start a new match.
 
-## Play the Game
-
-You can play the Tic Tac Toe game online at:  
-[Tic Tac Toe](https://tic-tac-toe.monowar.me/)
-
 ## Installation
 
-No installation is required. Simply open the `index.html` file in a web browser to start playing.
+No installation is required to use this game. Simply access the application through a web browser with an internet connection. You can play the Tic Tac Toe game online at: [Tic Tac Toe](https://tic-tac-toe.monowar.me/)
 
 ## Contributing
 
